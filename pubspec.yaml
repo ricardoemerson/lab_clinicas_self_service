@@ -38,17 +38,18 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
 
-  flutter_getit: ^2.0.0
   asyncstate: ^2.1.1-dev.1
-  dotted_border: ^2.1.0
-  validatorless: ^1.2.3
-  signals_flutter: ^3.0.0
-
-  dio: ^5.4.0
-  shared_preferences: ^2.2.2
-  json_annotation: ^4.8.1
   brasil_fields: ^1.14.2
   camera: ^0.10.5+9
+  dio: ^5.4.0
+  json_annotation: ^4.8.1
+  dotted_border: ^2.1.0
+  flutter_getit: ^2.0.0
+  phosphor_flutter: ^2.0.1
+  signals_flutter: ^3.0.0
+  shared_preferences: ^2.2.2
+  validatorless: ^1.2.3
+
 
 dev_dependencies:
   flutter_test:
