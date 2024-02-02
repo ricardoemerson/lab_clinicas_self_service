@@ -17,7 +17,7 @@ class UserLoginService implements IUserLoginService {
 
     switch (loginResponse) {
       case Left(value: AuthException(:final message)):
-        return Left(ServiceException(message));
+        return Left(ServiceException(message ?? 'Erro ao realizar o login.'));
       case Right(value: final accessToken):
         final sp = await SharedPreferences.getInstance();
         sp.setString(LocalStorageConstants.accessToken, accessToken);
