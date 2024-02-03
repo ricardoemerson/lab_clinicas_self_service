@@ -15,9 +15,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> with MessageViewMixin {
   final _formKey = GlobalKey<FormState>();
-
-  final _emailEC = TextEditingController();
-  final _passwordEC = TextEditingController();
+  final _emailEC = TextEditingController(text: 'terminal1@gmail.com');
+  final _passwordEC = TextEditingController(text: '123123');
 
   final controller = Injector.get<LoginController>();
 
@@ -76,7 +75,9 @@ class _LoginPageState extends State<LoginPage> with MessageViewMixin {
                     const SizedBox(height: 32),
                     TextFormField(
                       controller: _emailEC,
+                      autofocus: true,
                       decoration: const InputDecoration(labelText: 'e-Mail'),
+                      keyboardType: TextInputType.emailAddress,
                       validator: Validatorless.multiple([
                         Validatorless.required(AppValidatorMessages.required),
                         Validatorless.email(AppValidatorMessages.email),
@@ -95,9 +96,7 @@ class _LoginPageState extends State<LoginPage> with MessageViewMixin {
                                 controller.passwordToggle();
                               },
                               icon: Icon(
-                                controller.obscurePassword
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
+                                controller.obscurePassword ? Icons.visibility : Icons.visibility_off,
                               ),
                             ),
                           ),

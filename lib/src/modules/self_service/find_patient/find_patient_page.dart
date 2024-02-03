@@ -7,6 +7,7 @@ import 'package:signals_flutter/signals_flutter.dart';
 import 'package:validatorless/validatorless.dart';
 
 import '../self_service_controller.dart';
+import '../widgets/self_service_app_bar.dart';
 import 'find_patient_controller.dart';
 
 class FindPatientPage extends StatefulWidget {
@@ -47,27 +48,7 @@ class _FindPatientPageState extends State<FindPatientPage> with MessageViewMixin
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: LabClinicasAppBar(
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 64),
-            child: PopupMenuButton(
-              child: const IconPopupMenuButton(),
-              itemBuilder: (context) {
-                return [
-                  const PopupMenuItem(
-                    value: 1,
-                    child: Text('Reiniciar Processo'),
-                  ),
-                ];
-              },
-              onSelected: (value) async {
-                Injector.get<SelfServiceController>().restartProcess();
-              },
-            ),
-          ),
-        ],
-      ),
+      appBar: SelfServiceAppBar(),
       body: LayoutBuilder(
         builder: (_, constraints) {
           final sizeOf = MediaQuery.sizeOf(context);

@@ -17,8 +17,8 @@ class _WhoIAmPageState extends State<WhoIAmPage> {
   final controller = Injector.get<SelfServiceController>();
 
   final _formKey = GlobalKey<FormState>();
-  final _firstNameEC = TextEditingController();
-  final _lastNameEC = TextEditingController();
+  final _firstNameEC = TextEditingController(text: 'João');
+  final _lastNameEC = TextEditingController(text: 'Marques');
 
   @override
   void dispose() {
@@ -122,12 +122,14 @@ class _WhoIAmPageState extends State<WhoIAmPage> {
 
                                 if (formIsValid) {
                                   controller.setWhoIAmDataStepAndNext(
-                                      _firstNameEC.trimmedText, _lastNameEC.trimmedText);
+                                    _firstNameEC.trimmedText,
+                                    _lastNameEC.trimmedText,
+                                  );
                                 }
                               },
                               child: const Text('CONTINUAR'),
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),
