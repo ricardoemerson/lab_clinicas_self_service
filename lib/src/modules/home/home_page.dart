@@ -1,10 +1,5 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:lab_clinicas_core/lab_clinicas_core.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
-
-import '../../core/env/env.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -16,24 +11,23 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: LabClinicasAppBar(
         actions: [
-          PopupMenuButton<int>(
-            icon: PhosphorIcon(
-              PhosphorIcons.dotsThreeCircle(),
-              color: AppTheme.orangeColor,
-              size: 32,
+          Padding(
+            padding: const EdgeInsets.only(right: 64),
+            child: PopupMenuButton<int>(
+              icon: const IconPopupMenuButton(),
+              itemBuilder: (context) {
+                return [
+                  const PopupMenuItem<int>(
+                    value: 1,
+                    child: Text('Inicial Terminal'),
+                  ),
+                  const PopupMenuItem<int>(
+                    value: 2,
+                    child: Text('Finalizar Terminal'),
+                  ),
+                ];
+              },
             ),
-            itemBuilder: (context) {
-              return [
-                const PopupMenuItem<int>(
-                  value: 1,
-                  child: Text('Inicial Terminal'),
-                ),
-                const PopupMenuItem<int>(
-                  value: 2,
-                  child: Text('Finalizar Terminal'),
-                ),
-              ];
-            },
           ),
         ],
       ),
@@ -60,7 +54,7 @@ class HomePage extends StatelessWidget {
                 height: 48,
                 child: ElevatedButton(
                   onPressed: () {
-                    log('url: ${Env.backendBaseUrl}');
+                    Navigator.of(context).pushReplacementNamed('/self-service');
                   },
                   child: const Text('INICIAR TERMINAL'),
                 ),
