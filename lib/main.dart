@@ -8,6 +8,7 @@ import 'package:lab_clinicas_core/lab_clinicas_core.dart';
 import 'src/core/bindings/lab_clinica_application_bindings.dart';
 import 'src/modules/auth/auth_module.dart';
 import 'src/modules/home/home_module.dart';
+import 'src/modules/self_service/self_service_module.dart';
 import 'src/pages/splash/splash_page.dart';
 
 void main() {
@@ -38,6 +39,7 @@ class LabClinicasSelfServiceApp extends StatelessWidget {
       modules: [
         AuthModule(),
         HomeModule(),
+        SelfServiceModule(),
       ],
     );
   }
