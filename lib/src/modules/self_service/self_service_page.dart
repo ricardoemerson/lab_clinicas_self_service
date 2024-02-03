@@ -38,6 +38,8 @@ class _SelfServicePageState extends State<SelfServicePage> with MessageViewMixin
           case FormSteps.done:
             baseRoute += '/done';
           case FormSteps.restart:
+            Navigator.of(context).popUntil((route) => route.settings.name == '/self-service');
+            controller.startProcess();
             return;
         }
 
