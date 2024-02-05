@@ -32,4 +32,52 @@ class PatientRepository implements IPatientRepository {
       return Left(RepositoryException('Erro ao buscar paciente por CPF.'));
     }
   }
+
+  @override
+  Future<Either<RepositoryException, Unit>> update(PatientModel patient) async {
+    try {
+      await _restClient.auth.put(
+        '/patients/${patient.id}',
+        data: patient.toJson(),
+      );
+
+      return Right(unit);
+    } on DioException catch (e, s) {
+      log('Erro ao atualizar o paciente.', error: e, stackTrace: s);
+
+      return Left(RepositoryException('Erro ao atualizar o paciente. Chame o atendente.'));
+    }
+  }
+
+  @override
+  Future<Either<RepositoryException, PatientModel>> register(RegisterPatientModel patient) async {
+    try {
+      final Response(:data) = await _restClient.auth.post(
+        '/patients',
+        data: {
+          'name': patient.name,
+          'email': patient.email,
+          'phone_number': patient.phoneNumber,
+          'document': patient.document,
+          'address': {
+            'cep': patient.address.cep,
+            'street_address': patient.address.streetAddress,
+            'number': patient.address.number,
+            'address_complement': patient.address.addressComplement,
+            'state': patient.address.state,
+            'city': patient.address.city,
+            'district': patient.address.district,
+          },
+          'guardian': patient.guardian,
+          'guardian_identification_number': patient.guardianIdentificationNumber,
+        },
+      );
+
+      return Right(PatientModel.fromJson(data));
+    } on DioException catch (e, s) {
+      log('Erro ao cadastrar paciente.', error: e, stackTrace: s);
+
+      return Left(RepositoryException('Erro ao cadastrar paciente. Chame o atendente.'));
+    }
+  }
 }

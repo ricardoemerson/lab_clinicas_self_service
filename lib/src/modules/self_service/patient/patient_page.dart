@@ -1,10 +1,17 @@
 import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_getit/flutter_getit.dart';
 import 'package:lab_clinicas_core/lab_clinicas_core.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 import 'package:validatorless/validatorless.dart';
 
+import '../../../data/model/patient_model.dart';
+import '../../../data/model/self_service_model.dart';
+import '../../../data/repositories/patient/i_patient_repository.dart';
+import '../self_service_controller.dart';
 import '../widgets/self_service_app_bar.dart';
+import 'patient_controller.dart';
 
 class PatientPage extends StatefulWidget {
   const PatientPage({super.key});
@@ -14,8 +21,10 @@ class PatientPage extends StatefulWidget {
 }
 
 class _PatientPageState extends State<PatientPage> with MessageViewMixin {
-  final _formKey = GlobalKey<FormState>();
+  final controller = Injector.get<PatientController>();
+  final selfServiceController = Injector.get<SelfServiceController>();
 
+  final _formKey = GlobalKey<FormState>();
   final _nameEC = TextEditingController();
   final _emailEC = TextEditingController();
   final _phoneEC = TextEditingController();
@@ -29,6 +38,27 @@ class _PatientPageState extends State<PatientPage> with MessageViewMixin {
   final _districtEC = TextEditingController();
   final _guardianEC = TextEditingController();
   final _guardianIdentificationNumberEC = TextEditingController();
+
+  late bool patientFound;
+  late bool enableForm;
+
+  @override
+  void initState() {
+    messageListener(controller);
+
+    final SelfServiceModel(:patient) = selfServiceController.model;
+    patientFound = patient != null;
+    enableForm = !patientFound;
+    initializeForm(patient);
+
+    effect(() {
+      if (controller.nextStep) {
+        selfServiceController.updatePatientAndGoDocument(controller.patient);
+      }
+    });
+
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -47,6 +77,64 @@ class _PatientPageState extends State<PatientPage> with MessageViewMixin {
     _guardianIdentificationNumberEC.dispose();
 
     super.dispose();
+  }
+
+  void initializeForm(final PatientModel? patient) {
+    if (patient != null) {
+      _nameEC.text = patient.name;
+      _emailEC.text = patient.email;
+      _phoneEC.text = patient.phoneNumber;
+      _cpfEC.text = patient.document;
+      _cepEC.text = patient.address.cep;
+      _streetEC.text = patient.address.streetAddress;
+      _numberEC.text = patient.address.number;
+      _complementEC.text = patient.address.addressComplement;
+      _stateEC.text = patient.address.state;
+      _cityEC.text = patient.address.city;
+      _districtEC.text = patient.address.district;
+      _guardianEC.text = patient.guardian;
+      _guardianIdentificationNumberEC.text = patient.guardianIdentificationNumber;
+    }
+  }
+
+  PatientModel getPatientModelFromInputText(final PatientModel patient) {
+    return patient.copyWith(
+      name: _nameEC.trimmedText,
+      email: _emailEC.trimmedText,
+      phoneNumber: _phoneEC.trimmedText,
+      document: _cpfEC.trimmedText,
+      address: patient.address.copyWith(
+        cep: _cepEC.trimmedText,
+        streetAddress: _streetEC.trimmedText,
+        number: _numberEC.trimmedText,
+        addressComplement: _complementEC.trimmedText,
+        state: _stateEC.trimmedText,
+        city: _cityEC.trimmedText,
+        district: _districtEC.trimmedText,
+      ),
+      guardian: _guardianEC.trimmedText,
+      guardianIdentificationNumber: _guardianIdentificationNumberEC.trimmedText,
+    );
+  }
+
+  RegisterPatientModel getRegisterPatientModelFromInputText() {
+    return (
+      name: _nameEC.trimmedText,
+      email: _emailEC.trimmedText,
+      phoneNumber: _phoneEC.trimmedText,
+      document: _cpfEC.trimmedText,
+      address: (
+        cep: _cepEC.trimmedText,
+        streetAddress: _streetEC.trimmedText,
+        number: _numberEC.trimmedText,
+        addressComplement: _complementEC.trimmedText,
+        state: _stateEC.trimmedText,
+        city: _cityEC.trimmedText,
+        district: _districtEC.trimmedText,
+      ),
+      guardian: _guardianEC.trimmedText,
+      guardianIdentificationNumber: _guardianIdentificationNumberEC.trimmedText,
+    );
   }
 
   @override
@@ -71,21 +159,31 @@ class _PatientPageState extends State<PatientPage> with MessageViewMixin {
               key: _formKey,
               child: Column(
                 children: [
-                  Image.asset('assets/images/check_icon.png'),
+                  Visibility(
+                    visible: patientFound,
+                    replacement: Image.asset('assets/images/lupa_icon.png'),
+                    child: Image.asset('assets/images/check_icon.png'),
+                  ),
                   const SizedBox(height: 24),
-                  const Text('Cadastro encontrado', style: AppTheme.titleSmallStyle),
-                  const SizedBox(height: 32),
-                  const Text(
-                    'Confirme os dados do seu cadastro',
-                    style: TextStyle(
+                  Text(
+                    patientFound ? 'Cadastro encontrado' : 'Cadastro não encontrado',
+                    style: AppTheme.titleSmallStyle,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    patientFound
+                        ? 'Confirme os dados do seu cadastro'
+                        : 'Preencha o formulário abaixo para fazer o seu cadastro',
+                    style: const TextStyle(
                       color: AppTheme.blueColor,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 32),
                   TextFormField(
                     controller: _nameEC,
+                    readOnly: !enableForm,
                     autofocus: true,
                     decoration: const InputDecoration(labelText: 'Nome do Paciente'),
                     textCapitalization: TextCapitalization.words,
@@ -94,6 +192,7 @@ class _PatientPageState extends State<PatientPage> with MessageViewMixin {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _emailEC,
+                    readOnly: !enableForm,
                     autofocus: true,
                     decoration: const InputDecoration(labelText: 'e-Mail'),
                     keyboardType: TextInputType.emailAddress,
@@ -105,6 +204,7 @@ class _PatientPageState extends State<PatientPage> with MessageViewMixin {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _phoneEC,
+                    readOnly: !enableForm,
                     autofocus: true,
                     decoration: const InputDecoration(labelText: 'Telefone de Contato'),
                     keyboardType: TextInputType.phone,
@@ -117,6 +217,7 @@ class _PatientPageState extends State<PatientPage> with MessageViewMixin {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _cpfEC,
+                    readOnly: !enableForm,
                     autofocus: true,
                     decoration: const InputDecoration(labelText: 'CPF'),
                     keyboardType: TextInputType.number,
@@ -129,6 +230,7 @@ class _PatientPageState extends State<PatientPage> with MessageViewMixin {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _cepEC,
+                    readOnly: !enableForm,
                     autofocus: true,
                     decoration: const InputDecoration(labelText: 'CEP'),
                     keyboardType: TextInputType.number,
@@ -145,6 +247,7 @@ class _PatientPageState extends State<PatientPage> with MessageViewMixin {
                         flex: 3,
                         child: TextFormField(
                           controller: _streetEC,
+                          readOnly: !enableForm,
                           autofocus: true,
                           decoration: const InputDecoration(labelText: 'Endereço'),
                           textCapitalization: TextCapitalization.words,
@@ -156,6 +259,7 @@ class _PatientPageState extends State<PatientPage> with MessageViewMixin {
                       Flexible(
                         child: TextFormField(
                           controller: _numberEC,
+                          readOnly: !enableForm,
                           autofocus: true,
                           decoration: const InputDecoration(labelText: 'Número'),
                           keyboardType: TextInputType.number,
@@ -170,6 +274,7 @@ class _PatientPageState extends State<PatientPage> with MessageViewMixin {
                       Expanded(
                         child: TextFormField(
                           controller: _complementEC,
+                          readOnly: !enableForm,
                           autofocus: true,
                           decoration: const InputDecoration(labelText: 'Complemento'),
                           textCapitalization: TextCapitalization.sentences,
@@ -180,6 +285,7 @@ class _PatientPageState extends State<PatientPage> with MessageViewMixin {
                       Expanded(
                         child: TextFormField(
                           controller: _districtEC,
+                          readOnly: !enableForm,
                           autofocus: true,
                           decoration: const InputDecoration(labelText: 'Bairro'),
                           textCapitalization: TextCapitalization.words,
@@ -195,6 +301,7 @@ class _PatientPageState extends State<PatientPage> with MessageViewMixin {
                       Expanded(
                         child: TextFormField(
                           controller: _cityEC,
+                          readOnly: !enableForm,
                           autofocus: true,
                           decoration: const InputDecoration(labelText: 'Cidade'),
                           textCapitalization: TextCapitalization.words,
@@ -205,6 +312,7 @@ class _PatientPageState extends State<PatientPage> with MessageViewMixin {
                       Expanded(
                         child: TextFormField(
                           controller: _stateEC,
+                          readOnly: !enableForm,
                           autofocus: true,
                           decoration: const InputDecoration(labelText: 'Estado'),
                           textCapitalization: TextCapitalization.words,
@@ -216,6 +324,7 @@ class _PatientPageState extends State<PatientPage> with MessageViewMixin {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _guardianEC,
+                    readOnly: !enableForm,
                     autofocus: true,
                     decoration: const InputDecoration(labelText: 'Responsável'),
                     textCapitalization: TextCapitalization.words,
@@ -223,6 +332,7 @@ class _PatientPageState extends State<PatientPage> with MessageViewMixin {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _guardianIdentificationNumberEC,
+                    readOnly: !enableForm,
                     autofocus: true,
                     decoration: const InputDecoration(labelText: 'Responsável de Identificação'),
                     keyboardType: TextInputType.number,
@@ -232,16 +342,34 @@ class _PatientPageState extends State<PatientPage> with MessageViewMixin {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  SizedBox(
-                    height: 48,
+                  Visibility(
+                    visible: !enableForm,
+                    replacement: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          final formIsValid = _formKey.currentState?.validate() ?? false;
+
+                          if (formIsValid) {
+                            if (patientFound) {
+                              controller
+                                  .updateAndNext(getPatientModelFromInputText(selfServiceController.model.patient!));
+                            } else {
+                              controller.saveAndNext(getRegisterPatientModelFromInputText());
+                            }
+                          }
+                        },
+                        child: Text(!patientFound ? 'CADASTRAR' : 'SALVAR E CONTINUAR'),
+                      ),
+                    ),
                     child: Row(
                       children: [
                         Expanded(
                           child: OutlinedButton(
                             onPressed: () {
-                              final formIsValid = _formKey.currentState?.validate() ?? false;
-
-                              if (formIsValid) {}
+                              setState(() {
+                                enableForm = true;
+                              });
                             },
                             child: const Text('EDITAR'),
                           ),
@@ -250,9 +378,8 @@ class _PatientPageState extends State<PatientPage> with MessageViewMixin {
                         Expanded(
                           child: ElevatedButton(
                             onPressed: () {
-                              final formIsValid = _formKey.currentState?.validate() ?? false;
-
-                              if (formIsValid) {}
+                              controller.patient = selfServiceController.model.patient;
+                              controller.goNextStep();
                             },
                             child: const Text('CONTINUAR'),
                           ),

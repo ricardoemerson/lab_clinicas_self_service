@@ -20,6 +20,8 @@ class SelfServiceController with MessageStateMixin {
 
   FormSteps get step => _step();
 
+  SelfServiceModel get model => _model;
+
   void startProcess() {
     _step.forceUpdate(FormSteps.whoIAm);
   }
@@ -41,5 +43,28 @@ class SelfServiceController with MessageStateMixin {
   void restartProcess() {
     _step.forceUpdate(FormSteps.restart);
     clearForm();
+  }
+
+  void updatePatientAndGoDocument(PatientModel? patient) {
+    _model = _model.copyWith(patient: () => patient);
+    _step.forceUpdate(FormSteps.documents);
+  }
+
+  void registerDocument(DocumentType type, String filePath) {
+    final documents = _model.documents ?? {};
+
+    if (type == DocumentType.healthInsuranceCard) {
+      documents[type]?.clear();
+    }
+
+    final values = documents[type] ?? [];
+    values.add(filePath);
+    documents[type] = values;
+
+    _model = _model.copyWith(documents: () => documents);
+  }
+
+  void clearDocuments() {
+    _model = _model.copyWith(documents: () => {});
   }
 }

@@ -50,8 +50,7 @@ class HomePage extends StatelessWidget {
               const Text('Bem-vindo', style: AppTheme.titleStyle),
               const SizedBox(height: 32),
               SizedBox(
-                width: sizeOf.width * .8,
-                height: 48,
+                width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).pushReplacementNamed('/self-service');

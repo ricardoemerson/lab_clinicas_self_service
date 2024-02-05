@@ -106,8 +106,7 @@ class _LoginPageState extends State<LoginPage> with MessageViewMixin {
                     ),
                     const SizedBox(height: 32),
                     SizedBox(
-                      width: sizeOf.width * .8,
-                      height: 48,
+                      width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
                           final formIsValid = _formKey.currentState?.validate() ?? false;

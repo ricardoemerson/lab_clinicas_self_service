@@ -116,8 +116,7 @@ class _FindPatientPageState extends State<FindPatientPage> with MessageViewMixin
                         ),
                         const SizedBox(height: 14),
                         SizedBox(
-                          width: sizeOf.width * .8,
-                          height: 48,
+                          width: double.infinity,
                           child: ElevatedButton(
                             onPressed: () {
                               final formIsValid = _formKey.currentState?.validate() ?? false;
