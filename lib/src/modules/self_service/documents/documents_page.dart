@@ -115,7 +115,10 @@ class _DocumentsPageState extends State<DocumentsPage> with MessageViewMixin {
                     children: [
                       Expanded(
                         child: OutlinedButton(
-                          onPressed: selfServiceController.clearDocuments,
+                          onPressed: () {
+                            selfServiceController.clearDocuments();
+                            setState(() {});
+                          },
                           style: OutlinedButton.styleFrom(
                             foregroundColor: Colors.red,
                             side: const BorderSide(color: Colors.red),

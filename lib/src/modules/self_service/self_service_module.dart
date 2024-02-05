@@ -5,7 +5,7 @@ import '../../data/repositories/patient/i_patient_repository.dart';
 import '../../data/repositories/patient/patient_repository.dart';
 import 'documents/documents_page.dart';
 import 'documents/scan/documents_scan_page.dart';
-import 'documents/scan_confirm/documents_scan_confirm_page.dart';
+import 'documents/scan_confirm/documents_scan_confirm_router.dart';
 import 'done/done_page.dart';
 import 'find_patient/find_patient_router.dart';
 import 'patient/patient_router.dart';
@@ -31,7 +31,7 @@ class SelfServiceModule extends FlutterGetItModule {
         '/patient': (context) => const PatientRouter(),
         '/documents': (context) => const DocumentsPage(),
         '/documents/scan': (context) => const DocumentsScanPage(),
-        '/documents/scan-confirm': (context) => const DocumentsScanConfirmPage(),
+        '/documents/scan/confirm': (context) => const DocumentsScanConfirmRouter(),
         '/done': (context) => const DonePage(),
       };
 }
