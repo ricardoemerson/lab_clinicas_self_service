@@ -1,8 +1,10 @@
+import 'package:asyncstate/asyncstate.dart';
 import 'package:lab_clinicas_core/lab_clinicas_core.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../data/model/patient_model.dart';
 import '../../data/model/self_service_model.dart';
+import '../../data/repositories/information_form/i_information_form_repository.dart';
 
 enum FormSteps {
   none,
@@ -15,8 +17,15 @@ enum FormSteps {
 }
 
 class SelfServiceController with MessageStateMixin {
+  final IInformationFormRepository _informationFormRepository;
+
+  SelfServiceController({
+    required IInformationFormRepository informationFormRepository,
+  }) : _informationFormRepository = informationFormRepository;
+
   final _step = ValueSignal(FormSteps.none);
   var _model = const SelfServiceModel();
+  var password = '';
 
   FormSteps get step => _step();
 
@@ -66,5 +75,17 @@ class SelfServiceController with MessageStateMixin {
 
   void clearDocuments() {
     _model = _model.copyWith(documents: () => {});
+  }
+
+  Future<void> finalize() async {
+    final response = await _informationFormRepository.register(model).asyncLoader();
+
+    switch (response) {
+      case Left(value: RepositoryException(:final message)):
+        showError(message);
+      case Right():
+        password = '${_model.firstName} ${_model.lastName}';
+        _step.forceUpdate(FormSteps.done);
+    }
   }
 }

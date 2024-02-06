@@ -129,7 +129,9 @@ class _DocumentsPageState extends State<DocumentsPage> with MessageViewMixin {
                       const SizedBox(width: 16),
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            await selfServiceController.finalize();
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppTheme.orangeColor,
                           ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_getit/flutter_getit.dart';
 
+import '../../data/repositories/information_form/i_information_form_repository.dart';
+import '../../data/repositories/information_form/information_form_repository.dart';
 import '../../data/repositories/patient/i_patient_repository.dart';
 import '../../data/repositories/patient/patient_repository.dart';
 import 'documents/documents_page.dart';
@@ -16,8 +18,9 @@ import 'who_i_am/who_i_am_page.dart';
 class SelfServiceModule extends FlutterGetItModule {
   @override
   List<Bind<Object>> get bindings => [
+        Bind.lazySingleton<IInformationFormRepository>((i) => InformationFormRepository(restClient: i())),
         Bind.lazySingleton<IPatientRepository>((i) => PatientRepository(restClient: i())),
-        Bind.lazySingleton((i) => SelfServiceController()),
+        Bind.lazySingleton((i) => SelfServiceController(informationFormRepository: i())),
       ];
 
   @override
@@ -32,6 +35,6 @@ class SelfServiceModule extends FlutterGetItModule {
         '/documents': (context) => const DocumentsPage(),
         '/documents/scan': (context) => const DocumentsScanPage(),
         '/documents/scan/confirm': (context) => const DocumentsScanConfirmRouter(),
-        '/done': (context) => const DonePage(),
+        '/done': (context) => DonePage(),
       };
 }
