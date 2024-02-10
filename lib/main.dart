@@ -39,8 +39,8 @@ class LabClinicasSelfServiceApp extends StatelessWidget {
       bindings: LabClinicaApplicationBindings(),
       pagesBuilders: [
         FlutterGetItPageBuilder(
-          page: (context) => const SplashPage(),
           path: '/',
+          page: (context) => const SplashPage(),
         ),
       ],
       modules: [
